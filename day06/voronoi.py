@@ -47,8 +47,39 @@ def flood(coordinates, n):
 
     return (flood, inf)
 
+def average(values):
+    return sum(values) / len(values)
+
+avgx = round(average([x[0] for x in coordinates]))
+avgy = round(average([x[1] for x in coordinates]))
+
+print(avgx)
+print(avgy)
+
+def is_close(x, y, d, coordinates):
+    s = 0    
+    for c in coordinates:
+        dist = abs(x - c[0]) + abs(y - c[1])
+        s += dist
+        if s >= d:
+            return False
+    return True
+
+
+N = 150
+close = 0
+for i in range(-N, N):
+    for j in range(-N, N):
+        x = avgx + i
+        y = avgy + j
+        if is_close(x, y, 10000, coordinates):
+            close += 1
+
+print(close)
+exit(0)
+
 print(coordinates)
-f, inf = flood(coordinates, 500)
+f, inf = flood(coordinates, 100)
 
 """
 for i in range(N):
