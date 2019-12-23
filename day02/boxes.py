@@ -20,3 +20,25 @@ three = sum([int(has_arity(x, 3)) for x in boxes])
 print(two)
 print(three)
 print(two * three)
+
+def get_difference(text1, text2):
+    r = []
+    for i, v in enumerate(text1):
+        r.append(ord(v) - ord(text2[i]))
+    return r
+
+def are_similar(text1, text2):
+    diffs = 0
+    for i, v in enumerate(text1):
+        if v != text2[i]:
+            diffs += 1
+            if diffs == 2:
+                return False
+    return True
+
+for t1 in boxes:
+    for t2 in boxes:
+        if t1 != t2 and are_similar(t1, t2):
+            print(t1)
+            print(t2)
+            print(get_difference(t1, t2))
