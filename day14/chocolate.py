@@ -5,12 +5,21 @@ recipes = [3, 7]
 a = 0
 b = 1
 
-steps = 330121
-chunk = 10
+steps = list(reversed([3,3,0,1,2,1]))
 
-while True:
-    if len(recipes) > (steps + chunk):
-        break
+for i in range(10**9):
+    if i % 10**6 == 0:
+        print(i)
+    if len(recipes) >= len(steps):
+        seen = True
+        for i, v in enumerate(steps):
+            if v != recipes[len(recipes) - i - 2]:
+                seen = False
+                break
+        if seen:
+            print(len(recipes) - len(steps))
+            exit(0)
+
     s = recipes[a] + recipes[b]
     if s >= 10:
         n1 = s % 10
@@ -21,5 +30,3 @@ while True:
         recipes.append(s)
     a = (a + recipes[a] + 1) % len(recipes)
     b = (b + recipes[b] + 1) % len(recipes)
-
-print(''.join([str(x) for x in recipes[steps:][:10]]))
