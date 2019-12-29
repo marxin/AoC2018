@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from termcolor import colored
+
 route_symbols = ['|', '-', '\\', '/', '+']
 cart_symbols = ['^', '>', 'v', '<']
 cart_orientations = [(0, -1), (1, 0), (0, 1), (-1, 0)]
@@ -17,13 +19,13 @@ def get_next_possible_moves(streets, position):
         return (0, 2)
     elif c == '/':
         newpos = (position[0] + 1, position[1])
-        if newpos in streets:
+        if newpos in streets and (streets[newpos] == '-' or streets[newpos] == '+'):
             return (1, 2)
         else:
             return (0, 3)
     elif c == '\\':
         newpos = (position[0] + 1, position[1])
-        if newpos in streets:
+        if newpos in streets and (streets[newpos] == '-' or streets[newpos] == '+'):
             return (0, 1)
         else:
             return (2, 3)
@@ -61,14 +63,15 @@ class Cart:
     def __repr__(self):
         return '%s:%s' % (str(self.position), str(self.orientation))
 
+N = 150
 def print_map(n, streets, carts):
     print('Map after: %d' % n)
-    for y in range(10):
-        for x in range(20):
+    for y in range(N):
+        for x in range(N):
             pos = (x, y)
             c = [c for c in carts if c.position == pos]
             if len(c):
-                print(cart_symbols[c[0].orientation], end = '')
+                print(colored(cart_symbols[c[0].orientation], 'red'), end = '')
             else:
                 if pos in streets:
                     print(streets[pos], end = '')
@@ -91,12 +94,12 @@ for y, l in enumerate(data):
             c = '-' if c.orientation == 1 or c.orientation == 3 else '|'
             streets[(x, y)] = c
 
-for i in range(20):
+for i in range(1000):
     for c in list(sorted(carts, key = lambda c: (c.position[1], c.position[0]))):        
         c.move(streets)
         for c2 in carts:
             if c2 != c and c2.position == c.position:
                 print('Crash at %s' % (str(c.position)))
+                print_map(i, streets, carts)
                 exit(0)
-
-    print_map(i, streets, carts)
+    # print_map(i, streets, carts)
