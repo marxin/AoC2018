@@ -94,12 +94,21 @@ for y, l in enumerate(data):
             c = '-' if c.orientation == 1 or c.orientation == 3 else '|'
             streets[(x, y)] = c
 
-for i in range(1000):
-    for c in list(sorted(carts, key = lambda c: (c.position[1], c.position[0]))):        
-        c.move(streets)
-        for c2 in carts:
-            if c2 != c and c2.position == c.position:
-                print('Crash at %s' % (str(c.position)))
-                print_map(i, streets, carts)
-                exit(0)
-    # print_map(i, streets, carts)
+crashed = set()
+
+def maybe_exit(carts):
+    if len(carts) == 1:
+        print(carts[0])
+        exit(0)
+
+for i in range(50000):
+    maybe_exit(carts)
+    for c in list(sorted(carts, key = lambda c: (c.position[1], c.position[0]))):
+        if not c in crashed:
+            c.move(streets)
+            for c2 in carts:
+                if c2 != c and c2.position == c.position:
+                    print('Crash at %d at %s' % (i, str(c.position)))
+                    crashed.add(c)
+                    crashed.add(c2)
+    carts = [c for c in carts if not c in crashed]
