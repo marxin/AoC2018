@@ -44,10 +44,10 @@ class Unit:
                         queue.append(newpos)
         return list(sorted(enemies.values(), key = lambda x: x[1]))[0]
 
-    def move_to_closest_enemy(self, map, units, closest, distance):
+    def try_one_move(self, map, units, start, distance):
         flood = {}
-        flood[closest.position] = 0
-        queue = deque([closest.position])
+        flood[start] = 0
+        queue = deque([start])
         while len(queue):
             p = queue.popleft()
             for move in directions:
@@ -61,6 +61,15 @@ class Unit:
             newpos = (self.position[0] + move[0], self.position[1] + move[1])
             if newpos in flood and flood[newpos] == distance - 1:
                 return newpos
+        return None
+
+    def move_to_closest_enemy(self, map, units, closest, distance):
+        for move in directions:
+            newpos = (closest.position[0] + move[0], closest.position[1] + move[1])
+            if not newpos in map and get_unit_by_position(units, newpos) == None:
+                np = self.try_one_move(map, units, newpos, distance - 1)
+                if np:
+                    return np
         return None
 
     def move(self, map, units):
@@ -123,7 +132,7 @@ for y, l in enumerate(lines):
         elif c == 'G' or c == 'E':
             units.append(Unit((x, y), c))
 
-print_map(0)
+#print_map(0)
 for i in range(1, 500):
     for unit in list(sorted(units, key = lambda x: x.order())):
         types = set([u.type for u in units])
@@ -139,4 +148,9 @@ for i in range(1, 500):
             continue
         unit.move(map, units)
         unit.fight(map, units)
-    print_map(i)
+
+    print('round %d' % i)
+    for unit in list(sorted(units, key = lambda x: x.order())):
+        t = 'Team.GOBLIN' if unit.type == 'G' else 'Team.ELF'
+        print('%d:%d:%d:%s' % (unit.position[0], unit.position[1], unit.hp, t))
+    #print_map(i)
