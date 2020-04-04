@@ -13,11 +13,12 @@ def get_unit_by_position(units, position):
     return None
 
 class Unit:
-    def __init__(self, position, type):
+    def __init__(self, position, type, unit_id):
         self.position = position
         self.type = type
         self.hp = 200
         self.attack = 3
+        self.id = unit_id
         pass
 
     def __repr__(self):
@@ -75,6 +76,9 @@ class Unit:
     def move(self, map, units):
         closest = self.get_closest_enemy(map, units)
         distance = closest[1]
+        if distance == sys.maxsize:
+            return
+        print('Closest for %s%d -> %s%d (distance: %d)' % (self.type, self.id, closest[0].type, closest[0].id, distance))
         if distance > 1:
             newpos = self.move_to_closest_enemy(map, units, closest[0], distance)
             if newpos != None:
@@ -121,18 +125,20 @@ def print_map(rounds):
         u = sorted([x for x in units if x.position[1] == y], key = lambda x: x.position[0])
         print('   ', end='')
         for x in u:
-            print(' %s(%d)' % (colored(x.type, x.get_color()), x.hp), end = '')
+            print(' %s(%d)' % (colored(x.type + str(x.id), x.get_color()), x.hp), end = '')
         print()
 
+unit_id = 0
 for y, l in enumerate(lines):
     l = l.strip()
     for x, c in enumerate(l):
         if c == '#':
             map.add((x, y))
         elif c == 'G' or c == 'E':
-            units.append(Unit((x, y), c))
+            units.append(Unit((x, y), c, unit_id))
+            unit_id += 1
 
-#print_map(0)
+print_map(0)
 for i in range(1, 500):
     for unit in list(sorted(units, key = lambda x: x.order())):
         types = set([u.type for u in units])
@@ -149,8 +155,4 @@ for i in range(1, 500):
         unit.move(map, units)
         unit.fight(map, units)
 
-    print('round %d' % i)
-    for unit in list(sorted(units, key = lambda x: x.order())):
-        t = 'Team.GOBLIN' if unit.type == 'G' else 'Team.ELF'
-        print('%d:%d:%d:%s' % (unit.position[0], unit.position[1], unit.hp, t))
-    #print_map(i)
+    print_map(i)
