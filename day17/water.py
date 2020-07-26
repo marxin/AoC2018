@@ -46,46 +46,38 @@ def draw():
         draw.point(s, fill = (0, 256, 256))
     im.save('water.png')
 
+def fill_level_up(tip):
+    new_water = [tip]
+    overflow = False
+    for step in [1, -1]:
+        i = 1
+        while True:
+            p = (tip[0] + i * step, tip[1])
+            if p in points:
+                break
+            pdown = (p[0], p[1] + 1)
+            if pdown in points or pdown in water:
+                new_water.append(p)
+            else:
+                tips.append(p)
+                sprinkle.add(p)
+                overflow = True
+                break
+            i += 1
+    for w in new_water:
+        water.add(w)
+    if not overflow:
+        upper = (tip[0], tip[1] - 1)
+        if upper in sprinkle:
+            tips.append(upper)
+
 while tips:
     tip = tips.popleft()
     fall = (tip[0], tip[1] + 1)
     if fall in points or fall in water:
         if tip in sprinkle:
             # fill level up
-            water.add(tip)
-            x = 1
-            overflow = False
-            while True:
-                p = (tip[0] + x, tip[1])
-                if p in points:
-                    break
-                pdown = (p[0], p[1] + 1)
-                if pdown in points or pdown in water:
-                    water.add(p)
-                else:
-                    tips.append(p)
-                    sprinkle.add(p)
-                    overflow = True
-                    break
-                x += 1
-            x = -1
-            while True:
-                p = (tip[0] + x, tip[1])
-                if p in points:
-                    break
-                pdown = (p[0], p[1] + 1)
-                if pdown in points or pdown in water:
-                    water.add(p)
-                else:
-                    tips.append(p)
-                    sprinkle.add(p)
-                    overflow = True
-                    break
-                x -= 1
-            if not overflow:
-                upper = (tip[0], tip[1] - 1)
-                if upper in sprinkle:
-                    tips.append(upper)
+            fill_level_up(tip)
     else:
         sprinkle.add(fall)
         tips.append(fall)
