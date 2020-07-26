@@ -6,21 +6,8 @@ from collections import deque
 
 points = set()
 water = set()
-
-class Stream:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.height = 1
-
-    def step(self):
-        fall = (self.x, self.y + self.height + 1)
-        if fall in points or fall in water:
-            pass
-        else:
-            self.height += 1
-
-streams = [Stream(500, 0)]
+tips = deque([(500, 0)])
+sprinkle = set([(500, 0)])
 
 for line in open('input.txt').readlines():
     line = line.strip()
@@ -55,17 +42,10 @@ def draw():
         draw.point(p, fill = (0, 0, 0))
     for w in water:
         draw.point(w, fill = (0, 0, 256))
-    for stream in streams:
-        for y in range(stream.height + 1):
-            draw.point((stream.x, stream.y + y), fill = (0, 256, 256))
-
+    for s in sprinkle:
+        draw.point(s, fill = (0, 256, 256))
     im.save('water.png')
 
-for i in range(100):
-    for stream in streams:
-        stream.step()
-
-"""
 while tips:
     tip = tips.popleft()
     fall = (tip[0], tip[1] + 1)
@@ -109,6 +89,5 @@ while tips:
     else:
         sprinkle.add(fall)
         tips.append(fall)
-"""
 
 draw()
