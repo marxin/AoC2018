@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import re
+import sys
 from PIL import Image, ImageDraw
 from collections import deque
 
@@ -46,6 +47,22 @@ def draw():
         draw.point(s, fill = (0, 256, 256))
     im.save('water.png')
 
+def can_flood(fall):
+    if not fall in water:
+        return True
+    for step in [1, -1]:
+        i = 1
+        while True:
+            p = (fall[0] + i * step, fall[1])
+            if p not in water:
+                break
+            elif p in sprinkle:
+                p2 = (p[0], p[1] - 1)
+                if p2 not in sprinkle:
+                    return False
+            i += 1
+    return True
+
 def fill_level_up(tip):
     new_water = [tip]
     overflow = False
@@ -71,12 +88,20 @@ def fill_level_up(tip):
         if upper in sprinkle:
             tips.append(upper)
 
+stop = -1
+if len(sys.argv) == 2:
+    stop = int(sys.argv[1])
+
+step = 1
 while tips:
+    print(step)
+    step += 1
+    if step == stop:
+        break
     tip = tips.popleft()
     fall = (tip[0], tip[1] + 1)
     if fall in points or fall in water:
-        if tip in sprinkle:
-            # fill level up
+        if can_flood(fall):
             fill_level_up(tip)
     else:
         sprinkle.add(fall)
